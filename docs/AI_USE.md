@@ -1,0 +1,5 @@
+# How I used AI
+
+I worked with Claude throughout. I wrote the package code and the naive workflow, and made the decisions on structure and naming with its suggestions. Claude drafted the staged workflow and the Dockerfile. I reviewed both and changed them: I added the twine check, started the post-publish stage, reordered the stages and named every step. Claude proposed the bugs, created the bug branches, merged `main` into them when the workflow changed, and collected the run results. I also used it to work out which reliability and security checks to add, and left out the ones I could not justify for a package this small.
+
+Some of its suggestions were wrong. Its first list of bugs was the obvious one, and after I pushed back it tested them and replaced three. It said an encoding bug would crash on Windows, and that depended on which letters were in the file. Its claims about runners were from memory, so I added a script that dumps the environment in every job and compared the output.
