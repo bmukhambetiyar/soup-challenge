@@ -80,7 +80,7 @@ jobs:
               with:
                 python-version: ${{ matrix.python-version }}
             - name: Install the package and pytest
-              run: python -m pip install . pytest
+              run: python -m pip install . pytest==9.2.0
             - name: Run unit tests
               run: python -m pytest
 
@@ -202,6 +202,31 @@ jobs:
                   sleep 20
                 done
                 ls published/*.whl
+            - name: Download the built package
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                name: dist
+                path: built/
+            - name: Check that the published wheel is the one that was tested
+              run: |
+                python - <<'EOF'
+                import glob
+                import hashlib
+
+
+                def sha256(pattern):
+                    (path,) = glob.glob(pattern)
+                    with open(path, "rb") as f:
+                        return hashlib.sha256(f.read()).hexdigest()
+
+
+                built = sha256("built/*.whl")
+                published = sha256("published/*.whl")
+                print("built    ", built)
+                print("published", published)
+                if built != published:
+                    raise SystemExit("The published wheel differs from the built artifact")
+                EOF
             - name: Install it in a clean venv
               run: |
                 python -m venv "$RUNNER_TEMP/published env"
