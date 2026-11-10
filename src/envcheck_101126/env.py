@@ -3,7 +3,7 @@ import os
 import platform
 import shutil
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib import resources
 
 from packaging import version
@@ -40,7 +40,7 @@ def get_environment():
         "git_version": get_git_version(),
         "container_arch": CONTAINER_ARCH.get(machine, machine),
         "current_directory": os.getcwd(),
-        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "checked_at": datetime.now(UTC).isoformat(),
     }
 
 
