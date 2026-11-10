@@ -1,6 +1,6 @@
+import json
 import os
 import platform
-import json
 
 
 def get_environment():
