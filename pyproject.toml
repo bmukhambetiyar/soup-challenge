@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "envcheck-101126"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="bmukhambetiyar", email="bibarys.mukhambetiyar@gmail.com" },
 ]
