@@ -11,7 +11,6 @@ from packaging import version
 CONTAINER_ARCH = {
     "x86_64": "amd64",
     "AMD64": "amd64",
-    "aarch64": "arm64",
     "arm64": "arm64",
 }
 
@@ -38,7 +37,7 @@ def get_environment():
         "operating_system": platform.system(),
         "architecture": machine,
         "git_version": get_git_version(),
-        "container_arch": CONTAINER_ARCH.get(machine, machine),
+        "container_arch": CONTAINER_ARCH[machine],
         "current_directory": os.getcwd(),
         "checked_at": datetime.now(timezone.utc).isoformat(),
     }
