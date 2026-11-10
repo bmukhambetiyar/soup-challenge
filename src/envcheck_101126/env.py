@@ -1,7 +1,11 @@
 import json
 import os
 import platform
+import shutil
+import subprocess
+from datetime import datetime, timezone
 from importlib import resources
+
 from packaging import version
 
 CONTAINER_ARCH = {
@@ -18,16 +22,25 @@ RULES = json.loads(
 )
 
 
+def get_git_version():
+    if shutil.which("git") is None:
+        return None
+    return subprocess.check_output(["git", "--version"], text=True).strip()
+
+
 def get_environment():
     machine = platform.machine()
     return {
-        "python_supported": version.parse(platform.python_version()) >= version.parse(RULES["min_python"]),
+        "python_supported": version.parse(platform.python_version())
+        >= version.parse(RULES["min_python"]),
         "python_version": platform.python_version(),
         "python_implementation": platform.python_implementation(),
         "operating_system": platform.system(),
         "architecture": machine,
+        "git_version": get_git_version(),
         "container_arch": CONTAINER_ARCH.get(machine, machine),
         "current_directory": os.getcwd(),
+        "checked_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
