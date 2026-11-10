@@ -9,6 +9,7 @@ authors = [
   { name="bmukhambetiyar", email="bibarys.mukhambetiyar@gmail.com" },
 ]
 description = "A small package that checks the current environment"
+dependencies = ["packaging>=22"]
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
