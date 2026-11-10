@@ -23,6 +23,7 @@ def main():
     else:
         for key, value in env.items():
             print(f"{key}: {value}")
+        print("✓ environment checked")
 
 
 if __name__ == "__main__":

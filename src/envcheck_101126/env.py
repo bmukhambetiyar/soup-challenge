@@ -1,9 +1,8 @@
 import json
 import os
 import platform
-import shutil
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib import resources
 
 from packaging import version
@@ -11,7 +10,6 @@ from packaging import version
 CONTAINER_ARCH = {
     "x86_64": "amd64",
     "AMD64": "amd64",
-    "aarch64": "arm64",
     "arm64": "arm64",
 }
 
@@ -23,8 +21,6 @@ RULES = json.loads(
 
 
 def get_git_version():
-    if shutil.which("git") is None:
-        return None
     return subprocess.check_output(["git", "--version"], text=True).strip()
 
 
@@ -38,9 +34,9 @@ def get_environment():
         "operating_system": platform.system(),
         "architecture": machine,
         "git_version": get_git_version(),
-        "container_arch": CONTAINER_ARCH.get(machine, machine),
+        "container_arch": CONTAINER_ARCH[machine],
         "current_directory": os.getcwd(),
-        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "checked_at": datetime.now(UTC).isoformat(),
     }
 
 
