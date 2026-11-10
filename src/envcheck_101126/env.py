@@ -1,7 +1,6 @@
 import json
 import os
 import platform
-import shutil
 import subprocess
 from datetime import datetime, timezone
 from importlib import resources
@@ -23,8 +22,6 @@ RULES = json.loads(
 
 
 def get_git_version():
-    if shutil.which("git") is None:
-        return None
     return subprocess.check_output(["git", "--version"], text=True).strip()
 
 
