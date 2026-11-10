@@ -1,5 +1,5 @@
 # What surprised me and what still concerns me
 
-Draft material for the paragraph in the email.
+Draft for the paragraph in the email. Edit it so it says what you actually think.
 
-After renaming the package, the old name was still in the entry point. Build and install passed and the command crashed, while importing a module still worked. Later I left `from datetime import UTC` in `main` with lint and tests green on Python 3.13, and it was found only when the wheel was run on 3.10. The red runs from setup are still in the history.
+What surprised me most is how easy it was to break the package by accident with everything green. After renaming it, the old name was still in the entry point: build and install passed, importing a module worked, and the command crashed. Later I left `from datetime import UTC` in `main` with lint and tests green on Python 3.13, and it was found only when the wheel was run on 3.10. I also did not expect that a line in `.gitignore` could remove a file from the built package while git still tracked it, or that unit tests could pass on Windows while the installed command failed there. What still concerns me is that the pipeline only catches what I thought to put in it. Linux ARM was fully green until I added a runner for it, and I do not know what the next missing case is. The build tools are also not pinned by hash, so a compromised build tool could change the wheel while every check passes, and the check of the published package runs only after an upload that cannot be undone.

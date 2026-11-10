@@ -4,8 +4,7 @@ A small command-line tool that prints facts about the machine it runs on: Python
 
 This repository is my take-home task for the DevOps internship at Soup. The package is small on purpose. The task is about the release pipeline around it: can it be trusted to publish to PyPI with no human involved?
 
-- Notes (the write-up): [docs/NOTE.md](https://github.com/bmukhambetiyar/soup-challenge/blob/main/docs/NOTE.md)
-- How I used AI: [docs/AI_USE.md](https://github.com/bmukhambetiyar/soup-challenge/blob/main/docs/AI_USE.md)
+- Notes, including how I used AI: [docs/NOTE.md](https://github.com/bmukhambetiyar/soup-challenge/blob/main/docs/NOTE.md)
 - Package on TestPyPI: [envcheck-101126](https://test.pypi.org/project/envcheck-101126/)
 
 ## Try the package
