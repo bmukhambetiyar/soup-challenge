@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "envcheck-101126"
+version = "0.0.1"
+authors = [
+  { name="bmukhambetiyar", email="bibarys.mukhambetiyar@gmail.com" },
+]
+description = "A small package that checks the current environment"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.scripts]
+envcheck = "envcheck_101126.cli:main"
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "LICENSE"]
