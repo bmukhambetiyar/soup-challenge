@@ -11,7 +11,7 @@ def main():
     parser.add_argument(
         "--json",
         action="store_true",
-        help="Output the environment information in JSON format"
+        help="Output the environment information in JSON format",
     )
 
     args = parser.parse_args()
