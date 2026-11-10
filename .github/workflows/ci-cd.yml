@@ -11,20 +11,26 @@ permissions:
 
 jobs:
     lint:
+        name: Lint
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Check out the code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                 persist-credentials: false
-            - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+            - name: Set up Python
+              uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
               with:
                 python-version: "3.13"
-            - run: python -m pip install ruff==0.17.4
-            - run: ruff check src tests
-            - run: ruff format --check src tests
-            
+            - name: Install ruff
+              run: python -m pip install ruff==0.17.4
+            - name: Check lint rules
+              run: ruff check src tests
+            - name: Check formatting
+              run: ruff format --check src tests
 
     test:
+        name: Test
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
@@ -32,35 +38,47 @@ jobs:
                 os: [ubuntu-latest, windows-latest, macos-latest]
                 python-version: ["3.10", "3.12", "3.14"]
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Check out the code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                 persist-credentials: false
-            - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+            - name: Set up Python
+              uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
               with:
                 python-version: ${{ matrix.python-version }}
-            - run: python -m pip install . pytest
-            - run: python -m pytest
-            - run: python scripts/env_dump.py
+            - name: Install the package and pytest
+              run: python -m pip install . pytest
+            - name: Run unit tests
+              run: python -m pytest
 
     build:
+        name: Build
         needs: [lint, test]
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Check out the code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                 persist-credentials: false
-            - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+            - name: Set up Python
+              uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
               with:
                 python-version: "3.13"
-            - run: python -m pip install build==1.6.1
-            - run: python -m build
-            - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+            - name: Install build tools
+              run: python -m pip install build==1.6.1 twine==7.0.0
+            - name: Build sdist and wheel
+              run: python -m build
+            - name: Check package metadata
+              run: python -m twine check --strict dist/*
+            - name: Upload the built package
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                 name: dist
                 path: dist/
                 if-no-files-found: error
 
     verify:
+        name: Verify built wheel
         needs: build
         runs-on: ${{ matrix.os }}
         strategy:
@@ -72,10 +90,12 @@ jobs:
             run:
                 shell: bash
         steps:
-            - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+            - name: Set up Python
+              uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
               with:
                 python-version: ${{ matrix.python-version }}
-            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+            - name: Download the built package
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                 name: dist
                 path: dist/
@@ -99,31 +119,91 @@ jobs:
                 grep -q '^python_version: ' out.txt
 
     docker:
+        name: Verify in slim container
         needs: build
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Check out the code (for the Dockerfile)
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                 persist-credentials: false
-            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+            - name: Download the built package
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                 name: dist
                 path: dist/
-            - run: docker build -t envcheck:ci .
-            - run: docker run --rm envcheck:ci --json
+            - name: Build the image with the wheel installed
+              run: docker build -t envcheck:ci .
+            - name: Run the command as a non-root user
+              run: docker run --rm envcheck:ci --json
 
     publish:
+        name: Publish to TestPyPI
         needs: [verify, docker]
         if: startsWith(github.ref, 'refs/tags/v')
         runs-on: ubuntu-latest
-        environment: testpypi
+        environment:
+            name: testpypi
+            url: https://test.pypi.org/project/envcheck-101126/${{ steps.meta.outputs.version }}/
         permissions:
             id-token: write
+        outputs:
+            version: ${{ steps.meta.outputs.version }}
         steps:
-            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+            - name: Read the version from the tag
+              id: meta
+              run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            - name: Download the built package
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                 name: dist
                 path: dist/
-            - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+            - name: Upload to TestPyPI with a short-lived OIDC token
+              uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
               with:
                 repository-url: https://test.pypi.org/legacy/
+
+    verify-published:
+        name: Verify published package
+        needs: publish
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+                python-version: ["3.10", "3.12", "3.14"]
+        defaults:
+            run:
+                shell: bash
+        env:
+            VERSION: ${{ needs.publish.outputs.version }}
+        steps:
+            - name: Set up Python
+              uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+              with:
+                python-version: ${{ matrix.python-version }}
+            - name: Download the published wheel from TestPyPI
+              run: |
+                # The index can take a moment to list a new version, so retry.
+                for attempt in 1 2 3 4 5 6; do
+                  python -m pip download --no-deps --only-binary :all: \
+                    --index-url https://test.pypi.org/simple/ \
+                    -d published "envcheck-101126==$VERSION" && break
+                  sleep 20
+                done
+                ls published/*.whl
+            - name: Install it in a clean venv
+              run: |
+                python -m venv "$RUNNER_TEMP/published env"
+                if [ "$RUNNER_OS" = "Windows" ]; then
+                  BIN="$RUNNER_TEMP/published env/Scripts"
+                else
+                  BIN="$RUNNER_TEMP/published env/bin"
+                fi
+                "$BIN/python" -m pip install published/*.whl
+                echo "BIN=$BIN" >> "$GITHUB_ENV"
+            - name: Run the installed command in both modes
+              working-directory: ${{ runner.temp }}
+              run: |
+                "$BIN/envcheck" --json
+                "$BIN/envcheck"
