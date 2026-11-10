@@ -49,6 +49,40 @@ A version on a package index cannot be deleted, so I closed the two that end wit
 
 The tag check also caught a real mistake. I changed the version to 0.0.2, forgot to commit it, and pushed the tag `v0.0.2`. [That run](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42819399734) failed in the build job and no matrix job started.
 
+## GPU CI
+
+`envcheck` has no GPU code, so this is a design for an ML package released through the same pipeline. Nothing here was run.
+
+**Assumptions.** The tests need one GPU with 16 GB of memory. A nightly run takes 20 minutes and a release run takes 45 minutes, including startup.
+
+**GPU time per month.** 30 nightly runs x 20 min + 4 releases x 45 min = 780 minutes = 13 hours.
+
+**Cost.** Prices are from the providers' pages on 10 Nov 2026.
+
+| Where | Price | Planned runs, 13 hours a month | Machine left on for a month, 720 hours |
+|---|---|---|---|
+| GitHub GPU runner, Linux 4-core | $0.052 per minute | $40.56 | cannot happen, the machine is gone when the job ends |
+| AWS `g4dn.xlarge` (T4, 16 GB), on-demand | $0.526 per hour | $6.84 | $378.72 |
+| AWS `g4dn.xlarge`, spot | $0.242 per hour | $3.15 | $174.24 |
+| RunPod RTX A5000 (24 GB) | $0.27 per hour | $3.51 | $194.40 |
+
+**Where I would rent.** I would start with the GitHub GPU runner, at $40.56 a month.
+
+- It is $37 a month more than AWS spot ($40.56 against $3.15).
+- For that, there is no runner to maintain and no machine that can be forgotten. One forgotten spot instance costs $174 in a month, which is 55 times the planned $3.15.
+- It needs a GitHub organization on the Team plan. A personal repository like this one cannot use it.
+
+I would switch to self-hosted runners on spot instances when usage grows. At 100 GPU hours a month GitHub costs $312 and spot costs $24.
+
+**How to avoid paying for failing runs.**
+
+- The GPU job runs last and needs every CPU stage to pass.
+- Its first step is a one-minute environment check, like `envcheck` extended to report the GPU. On the GitHub runner a nightly run that fails in the first 2 minutes costs $0.10. One that fails after the full 20 minutes costs $1.04.
+- `timeout-minutes` on the job, and no automatic retries.
+- The nightly run is skipped when there are no new commits since the last one.
+- No GPU job for pull requests from forks.
+- On rented machines: a shutdown timer on the machine itself, and a budget alert.
+
 ## What I would fix first
 
 The first thing to fix before real PyPI is the build job. Its tools are pinned by version but not by hash, and the build backend is an open range. A compromised build tool could change the wheel while every check stays green.
@@ -57,4 +91,4 @@ How I used AI is in [AI_USE.md](AI_USE.md).
 
 ## Still to write
 
-GPU CI costs (part 4) and the verdict (part 5).
+The verdict (part 5).
