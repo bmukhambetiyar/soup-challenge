@@ -86,7 +86,7 @@ What to fix first: hash-pin the build job, then restrict who can create `v*` tag
 
 ## What surprised me and what still concerns me
 
-What surprised me most was how hard it was to come up with a bug to inject. It is easy to overlook a bug during development, but difficult to inject one on purpose. I broke the package twice by accident without trying, and designing a bug that keeps a naive pipeline green took much longer. What still concerns me is that the pipeline only catches what I thought to put in it. Linux ARM was fully green until I added a runner for it, and I do not know what the next missing case is.
+What surprised me most was how hard it was to come up with a bug to inject. It is easy to overlook a bug during development, but difficult to inject one on purpose. I broke the package twice by accident without trying, but when I had to think of a realistic bug on purpose, I could not come up with one for a long time. What still concerns me is that the pipeline only catches what I thought to put in it. Linux ARM was fully green until I added a runner for it, and I do not know what the next missing case is.
 
 ## How I used AI
 
