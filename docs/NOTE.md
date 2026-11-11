@@ -71,7 +71,7 @@ How to avoid paying for failing runs:
 
 ## Verdict
 
-For TestPyPI, yes, and it already publishes without a human. For real PyPI, not yet.
+Can this pipeline be trusted to publish with no human involved? To TestPyPI, yes, and it already does. To real PyPI, not yet.
 
 What the runs support: every bug I injected was stopped before the upload, and a wrong tag was stopped twice. The published 0.0.2 wheel has the same SHA-256 as the wheel that was tested.
 
