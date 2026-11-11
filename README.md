@@ -57,6 +57,7 @@ Release runs:
 | `v0.0.1` | [green](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42811313788) | Published to TestPyPI with OIDC, then installed from TestPyPI and run on nine machines |
 | `v9.9.9` | [red](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42808989114) | Deliberate wrong tag. Stopped before the upload. |
 | `v0.0.2`, first attempt | [red](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42819399734) | My mistake: the version bump was not committed. Stopped in the build job, before the matrix. |
+| `v0.0.2` | [green](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/43059141916) | Released from the final pipeline. The published wheel has the same SHA-256 as the tested one, checked on nine machines. |
 
 `bug/strict-arch` was [fully green](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42794628906) until I added the Linux ARM runner. Earlier red runs, including setup mistakes, are still in the Actions history. Nothing was deleted or force-pushed.
 

@@ -20,7 +20,7 @@ Each bug is one commit on its own branch, with the same workflows as `main`. Cla
 | [`bug/strict-arch`](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42812076464) | strict lookup in the architecture map | wheel check, Linux ARM only |
 | [`incident/release-0.9.3`](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42812077988) | all six | tests, wheel check and container |
 
-`main` is [green](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42812078355), and [this run](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42811313788) published 0.0.1 to TestPyPI.
+`main` is [green](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42812078355), and [this run](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42811313788) published 0.0.1 to TestPyPI. [0.0.2](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/43059141916) came from the final pipeline.
 
 - `.gitignore`: git keeps tracking `rules.json`, but the build tool reads `.gitignore` and leaves the file out of the wheel. The naive pipeline builds and never installs the result.
 - Dependency: pytest installs `packaging` for itself, so any environment with pytest hides the missing declaration. This is "works for some users".
@@ -35,7 +35,7 @@ Each bug is one commit on its own branch, with the same workflows as `main`. Cla
 | Failure | Status | How |
 |---|---|---|
 | Version does not match the tag | closed | The build job compares the tag with the built file names. [Red run for `v9.9.9`](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/42808989114), nothing uploaded. |
-| Stale artifact | closed | One build per run, used by every later stage. After publishing, a step compares the SHA-256 of the wheel on TestPyPI with the built one. |
+| Stale artifact | closed | One build per run, used by every later stage. After publishing, a step compares the SHA-256 of the wheel on TestPyPI with the built one. It passed on all nine machines [for 0.0.2](https://github.com/bmukhambetiyar/soup-challenge/actions/runs/43059141916). |
 | Secret reachable from a fork PR | closed | No stored secrets. Only the publish job has `id-token: write`, and it needs a `v*` tag and the `testpypi` environment. |
 | Cache hiding a resolver error | closed | Nothing is cached. The cost is slower runs. |
 | Unpinned dependencies | partly | Actions by commit SHA, tools by version, base image by digest. The build backend is a range. |
@@ -73,7 +73,7 @@ How to avoid paying for failing runs:
 
 For TestPyPI, yes, and it already publishes without a human. For real PyPI, not yet.
 
-What the runs support: every bug I injected was stopped before the upload, and a wrong tag was stopped twice. For 0.0.1 I compared the published wheel with the tested one by hand and they were identical.
+What the runs support: every bug I injected was stopped before the upload, and a wrong tag was stopped twice. The published 0.0.2 wheel has the same SHA-256 as the wheel that was tested.
 
 Why not yet:
 
