@@ -84,6 +84,10 @@ Why not yet:
 
 What to fix first: hash-pin the build job, then restrict who can create `v*` tags. Until both are done I would keep one human approval on the publishing environment. The pipeline does the checking and the person only confirms the release.
 
+## What surprised me and what still concerns me
+
+What surprised me most was how hard it was to come up with a bug to inject. It is easy to overlook a bug during development, but difficult to inject one on purpose. I broke the package twice by accident without trying, and designing a bug that keeps a naive pipeline green took much longer. What still concerns me is that the pipeline only catches what I thought to put in it. Linux ARM was fully green until I added a runner for it, and I do not know what the next missing case is.
+
 ## How I used AI
 
 I worked with Claude throughout. I wrote the package code and the naive workflow, and made the decisions on structure and naming with its suggestions. Claude drafted the staged workflow and the Dockerfile. I reviewed both and changed them: I added the twine check, started the post-publish stage, reordered the stages and named every step. Claude proposed the bugs, created the bug branches, merged `main` into them when the workflow changed, and collected the run results. It also built the PDF of this note from the Markdown file. I also used it to work out which reliability and security checks to add, and left out the ones I could not justify for a package this small.
